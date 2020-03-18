@@ -420,6 +420,13 @@ module.exports = function(webpackEnv) {
                       },
                     },
                   ],
+                  [ require.resolve('babel-plugin-import'),
+                    {
+                      libraryName: "antd",
+                      libraryDirectory: 'es',
+                      style: true
+                    }
+                  ],
                 ],
                 // This is a feature of `babel-loader` for webpack (not Babel itself).
                 // It enables caching results in ./node_modules/.cache/babel-loader/
@@ -534,6 +541,23 @@ module.exports = function(webpackEnv) {
                 },
                 'sass-loader'
               ),
+            },
+            {
+              test: /\.less$/,
+              use: [
+                  {loader: require.resolve('style-loader')},
+                  {loader: require.resolve('css-loader')},
+                  {
+                      loader: require.resolve('less-loader'),
+                      options: {
+                          javascriptEnabled: true,
+                          modifyVars: {
+                            // '@primary-color': '#1DA57A',
+                            'hack': `true; @import "${paths.appSrc}/styles/variables.less";`,
+                          },
+                      }
+                  }
+              ]
             },
             // "file" loader makes sure those assets get served by WebpackDevServer.
             // When you `import` an asset, you get its (virtual) filename.
