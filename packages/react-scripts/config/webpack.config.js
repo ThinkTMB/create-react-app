@@ -544,6 +544,8 @@ module.exports = function(webpackEnv) {
                 'sass-loader'
               ),
             },
+            // Adds support for LESS (https://webpack.js.org/loaders/less-loader/#normal-usage).
+            // Options supporting (https://ant.design/docs/react/customize-theme#Customize-in-webpack)
             {
               test: /\.less$/,
               use: [
@@ -725,6 +727,7 @@ module.exports = function(webpackEnv) {
           // The formatter is invoked directly in WebpackDevServerUtils during development
           formatter: isEnvProduction ? typescriptFormatter : undefined,
         }),
+        // Replace momentjs to Day.js (https://ant.design/docs/react/use-with-create-react-app#Replace-momentjs-to-Day.js).
         new AntdDayjsWebpackPlugin(),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.
