@@ -549,18 +549,18 @@ module.exports = function(webpackEnv) {
             {
               test: /\.less$/,
               use: [
-                  {loader: require.resolve('style-loader')},
-                  {loader: require.resolve('css-loader')},
-                  {
-                      loader: require.resolve('less-loader'),
-                      options: {
-                          javascriptEnabled: true,
-                          modifyVars: {
-                            // '@primary-color': '#1DA57A',
-                            'hack': `true; @import "${paths.appSrc}/styles/variables.less";`,
-                          },
-                      }
+                {loader: require.resolve('style-loader')},
+                {loader: require.resolve('css-loader')},
+                {
+                  loader: require.resolve('less-loader'),
+                  options: {
+                    javascriptEnabled: true,
+                    modifyVars: {
+                      // '@primary-color': '#1DA57A',
+                      'hack': `true; @import "${paths.appSrc}/styles/variables.less";`,
+                    },
                   }
+                }
               ]
             },
             // "file" loader makes sure those assets get served by WebpackDevServer.
@@ -727,8 +727,6 @@ module.exports = function(webpackEnv) {
           // The formatter is invoked directly in WebpackDevServerUtils during development
           formatter: isEnvProduction ? typescriptFormatter : undefined,
         }),
-        // Replace momentjs to Day.js (https://ant.design/docs/react/use-with-create-react-app#Replace-momentjs-to-Day.js).
-        new AntdDayjsWebpackPlugin(),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell webpack to provide empty mocks for them so importing them works.
