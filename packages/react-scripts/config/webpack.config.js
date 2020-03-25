@@ -59,6 +59,8 @@ const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
+const lessRegex = /\.less$/;
+const lessModuleRegex = /\.module\.less$/;
 
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
@@ -77,8 +79,20 @@ module.exports = function(webpackEnv) {
   // Get environment variables to inject into our app.
   const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1));
 
+  const lessLoaderOptions = {
+    javascriptEnabled: true,
+    modifyVars: {
+      'hack': `true; @import "${paths.appSrc}/styles/variables.less";`,
+    },
+  }
+
+  // const themePath = path.resolve(process.cwd(), 'antd.theme.js');
+  // if (fs.existsSync(themePath)) {
+  //   lessLoaderOptions.modifyVars = require(themePath);
+  // }
+
   // common function to get style loaders
-  const getStyleLoaders = (cssOptions, preProcessor) => {
+  const getStyleLoaders = (cssOptions, preProcessor, options) => {
     const loaders = [
       isEnvDevelopment && require.resolve('style-loader'),
       isEnvProduction && {
@@ -131,6 +145,7 @@ module.exports = function(webpackEnv) {
           loader: require.resolve(preProcessor),
           options: {
             sourceMap: true,
+            ...options,
           },
         }
       );
@@ -544,22 +559,51 @@ module.exports = function(webpackEnv) {
             },
             // Adds support for LESS (https://webpack.js.org/loaders/less-loader/#normal-usage).
             // Options supporting (https://ant.design/docs/react/customize-theme#Customize-in-webpack)
+            // {
+            //   test: /\.less$/,
+            //   use: [
+            //     {loader: require.resolve('style-loader')},
+            //     {loader: require.resolve('css-loader')},
+            //     {
+            //       loader: require.resolve('less-loader'),
+            //       options: {
+            //         javascriptEnabled: true,
+            //         modifyVars: {
+            //           // '@primary-color': '#1DA57A',
+            //           'hack': `true; @import "${paths.appSrc}/styles/variables.less";`,
+            //         },
+            //       }
+            //     }
+            //   ]
+            // },
+            // less
             {
-              test: /\.less$/,
-              use: [
-                {loader: require.resolve('style-loader')},
-                {loader: require.resolve('css-loader')},
+              test: lessRegex,
+              exclude: lessModuleRegex,
+              use: getStyleLoaders(
                 {
-                  loader: require.resolve('less-loader'),
-                  options: {
-                    javascriptEnabled: true,
-                    modifyVars: {
-                      // '@primary-color': '#1DA57A',
-                      'hack': `true; @import "${paths.appSrc}/styles/variables.less";`,
-                    },
-                  }
-                }
-              ]
+                  importLoaders: 2,
+                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                },
+                'less-loader',
+                lessLoaderOptions,
+              ),
+              sideEffects: true,
+            },
+            // less module
+            {
+              test: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 2,
+                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                  modules: {
+                    getLocalIdent: getCSSModuleLocalIdent,
+                  },
+                },
+                'less-loader',
+                lessLoaderOptions,
+              ),
             },
             // "file" loader makes sure those assets get served by WebpackDevServer.
             // When you `import` an asset, you get its (virtual) filename.
